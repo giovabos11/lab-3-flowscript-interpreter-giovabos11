@@ -1,0 +1,7 @@
+digraph {
+    input
+    sortNumbers [shape="square"]
+    output
+    input -> sortNumbers
+    sortNumbers -> output
+}

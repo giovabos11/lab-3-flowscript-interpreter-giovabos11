@@ -1,12 +1,13 @@
-#include <fstream>
-
-#include "./lib/jobsysteminterface.h"
+#include "interpreter.h"
 
 using namespace std;
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    Interpreter interpreter;
+
+    interpreter.loadFile("../Data/test1.flowscript");
+    interpreter.parse();
 
     return 0;
 }
