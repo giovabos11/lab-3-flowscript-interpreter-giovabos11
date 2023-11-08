@@ -6,7 +6,7 @@ int main()
 {
     Interpreter interpreter;
 
-    interpreter.loadFile("../Data/test1.flowscript");
+    interpreter.loadFile("../Data/flowscript_test1.dot");
     interpreter.parse();
 
     cout << interpreter.getErrorMessage() << endl;
