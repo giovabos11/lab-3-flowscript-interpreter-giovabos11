@@ -27,6 +27,15 @@ void Interpreter::loadFile(std::string filename)
     }
 }
 
+void Interpreter::generateError(int errorCode, std::string errorMessage, int errorLine)
+{
+    std::cout << "ERROR!" << std::endl;
+    this->errorCode = errorCode;
+    this->errorMessage = errorMessage;
+    this->errorLine = errorLine;
+    return;
+}
+
 void Interpreter::parse()
 {
     int lineNumber;
@@ -49,10 +58,7 @@ void Interpreter::parse()
             // Syntax Error
             if (std::isdigit(c) && leftToken.size() == 0)
             {
-                std::cout << "ERROR" << std::endl;
-                errorCode = 1;
-                errorMessage = "Process cannot start with digit";
-                errorLine = lineNumber;
+                generateError(1, "Process cannot start with digit", lineNumber);
                 return;
             }
 
@@ -66,27 +72,66 @@ void Interpreter::parse()
             // Argument list
             else if (c == '[')
             {
+                // Syntax errors
+                if (codeLines[i].find("]") == std::string::npos)
+                {
+                    generateError(1, "Missing closing bracket", lineNumber);
+                    return;
+                }
+                if (codeLines[i].find("]") < j)
+                {
+                    generateError(1, "Closing bracket before opening bracket", lineNumber);
+                    return;
+                }
+
                 // Get argument
                 std::string arg = codeLines[i].substr(j + 1, codeLines[i].find("]") - codeLines[i].find("[") - 1);
-                std::cout << arg << std::endl;
+                // std::cout << arg << std::endl;
 
-                // SPLIT ARG INTO TOKENS (BY SPACE)
+                // Handle process
+                if (arg.find("shape=\"square\"") != std::string::npos)
+                {
+                    std::cout << "square" << std::endl;
+                }
+                // Handle conditional (if statement)
+                else if (arg.find("shape=\"diamond\"") != std::string::npos)
+                {
+                    std::cout << "diamond" << std::endl;
+                }
+                // Handle conditional (switch statement)
+                else if (arg.find("shape=\"trapezium\"") != std::string::npos)
+                {
+                    std::cout << "trapezium" << std::endl;
+                }
+                // Handle branching (multi-process)
+                else if (arg.find("shape=\"point\"") != std::string::npos)
+                {
+                    std::cout << "point" << std::endl;
+                }
 
-                if (arg == "shape=\"square\"")
+                // Handle branching process (multi-process)
+                if (arg.find("style=\"dashed\"") != std::string::npos)
                 {
-                }
-                else if (arg == "shape=\"diamond\"")
-                {
-                }
-                else if (arg == "shape=\"trapezium\"")
-                {
-                }
-                else if (arg == "shape=\"point\"")
-                {
+                    std::cout << "multi" << std::endl;
                 }
 
-                if (arg == "style=\"dashed\"")
+                // Handle label
+                if (arg.find("label=\"") != std::string::npos)
                 {
+                    // Get label
+                    std::string label = "";
+                    for (int x = arg.find("label=\"") + 7; x < arg.size(); x++)
+                    {
+                        if (arg[x] != '\"')
+                        {
+                            label += arg[x];
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    std::cout << label << std::endl;
                 }
 
                 // Skip to the end of the argument
@@ -98,13 +143,46 @@ void Interpreter::parse()
             // Dependency (Arrow)
             else if (c == '-' && codeLines[i][j + 1] == '>')
             {
-                // Change side
-                left = !left;
-                j++;
                 // std::cout << "arrow ";
-                // STATE DEPENDENCY HERE (IF LEFT TOKEN != "")
+                // STATE DEPENDENCY HERE
+                if (rightToken != "")
+                {
+                    std::cout << rightToken
+                              << " depends on "
+                              << leftToken << std::endl;
+                    leftToken = rightToken;
+                    rightToken = "";
+                }
+                else
+                    // Change side
+                    left = !left;
+                // Skip over the > symbol
+                j++;
+            }
+            // Invalid character
+            else if (c != ' ' && c != '{' && c != '}')
+            {
+                generateError(1, "Unknown symbol", lineNumber);
+                return;
             }
             // std::cout << leftToken << "|" << rightToken << std::endl;
+
+            // Keep checking if token is reserved word
+            // for (int x = 0; x < 4; x++)
+            // {
+            //     if (keywords[x] == leftToken)
+            //         std::cout << leftToken << std::endl;
+            //     if (keywords[x] == rightToken)
+            //         std::cout << rightToken << std::endl;
+            // }
+        }
+
+        // STATE DEPENDENCY HERE TOO
+        if (rightToken != "")
+        {
+            std::cout << rightToken
+                      << " depends on "
+                      << leftToken << std::endl;
         }
     }
 }

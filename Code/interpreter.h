@@ -6,10 +6,10 @@ class Interpreter
 {
 private:
     // DECLARE FLOWSCRIPT RESERVED KEYWORDS
-    std::string keywords[20] = {"digraph",
-                                "input",
-                                "output",
-                                "split"};
+    std::string keywords[4] = {"digraph",
+                               "input",
+                               "output",
+                               "split"};
     std::vector<std::string> codeLines;
 
     std::string input;
@@ -19,6 +19,8 @@ private:
     int errorCode;
     std::string errorMessage;
     int errorLine;
+
+    void generateError(int errorCode, std::string errorMessage, int errorLine);
 
 public:
     Interpreter()
