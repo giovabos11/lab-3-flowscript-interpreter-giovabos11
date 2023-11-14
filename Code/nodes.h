@@ -3,9 +3,6 @@
 #include <vector>
 #include <unordered_map>
 
-////// REMOVE
-#include <iostream>
-
 #include "./lib/jobsysteminterface.h"
 
 class Node
